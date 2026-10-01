@@ -169,6 +169,49 @@
   }
   .map-marker:hover{ filter:drop-shadow(0 0 8px #ff3b3b); }
   .map-marker.active{ filter:drop-shadow(0 0 10px #fff); stroke-width:1.6; }
+  /* --- secret : effet "cassé" au 6e clic sur The Baguette --- */
+  @keyframes glitch-shake{
+    0%{ transform:translate(0,0); filter:none; }
+    10%{ transform:translate(-6px,2px) skewX(2deg); filter:hue-rotate(40deg) contrast(1.4); }
+    20%{ transform:translate(5px,-3px); filter:invert(0.15); }
+    30%{ transform:translate(-4px,4px) skewX(-2deg); filter:hue-rotate(-30deg); }
+    40%{ transform:translate(6px,1px); filter:contrast(1.8) saturate(2); }
+    50%{ transform:translate(-3px,-4px); filter:none; }
+    60%{ transform:translate(4px,3px) skewX(1deg); filter:invert(0.1) hue-rotate(60deg); }
+    70%{ transform:translate(-5px,-2px); filter:none; }
+    80%{ transform:translate(3px,2px); filter:contrast(1.3); }
+    100%{ transform:translate(0,0); filter:none; }
+  }
+  .layout.glitching{ animation:glitch-shake .65s steps(2,end); }
+  .layout.glitching .map-wrap, .layout.glitching .panel{
+    animation:glitch-shake .65s steps(2,end);
+  }
+
+  #broken-overlay{
+    position:fixed; inset:0; z-index:1000;
+    background:rgba(5,6,10,0.88);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    backdrop-filter:blur(2px);
+  }
+  #broken-overlay.hidden{ display:none; }
+  #broken-overlay::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 2px, transparent 4px);
+    mix-blend-mode:overlay;
+  }
+  #broken-text{
+    font-family:'Courier New', monospace;
+    font-size:clamp(28px,6vw,64px);
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color:var(--magenta);
+    text-shadow:
+      2px 0 var(--cyan),
+      -2px 0 #ff3b3b,
+      0 0 24px rgba(255,43,214,0.8);
+    animation:glitch-shake 1.2s infinite;
+  }
 </style>
 </head>
 <body>
@@ -191,6 +234,9 @@
   </div>
 </div>
 
+<div id="broken-overlay" class="hidden">
+  <div id="broken-text"></div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
@@ -1641,6 +1687,31 @@ var CLANS_DB = [
 ];
 
 /* Une deux et trois, la mort attend mon roi, quatre cinq et six, il renaitra comme un phénix*/
+var SECRET_BAGUETTE_CLICKS = 0;
+var SECRET_BAGUETTE_TEXT = "Place Holder";
+
+function registerSecretClick(){
+  SECRET_BAGUETTE_CLICKS++;
+  if(SECRET_BAGUETTE_CLICKS % 6 === 0) triggerBrokenEffect(SECRET_BAGUETTE_TEXT);
+}
+
+function triggerBrokenEffect(text){
+  var overlay = document.getElementById('broken-overlay');
+  document.getElementById('broken-text').textContent = text;
+  overlay.classList.remove('hidden');
+  document.querySelector('.layout').classList.add('glitching');
+  setTimeout(function(){
+    document.querySelector('.layout').classList.remove('glitching');
+  }, 650);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var overlay = document.getElementById('broken-overlay');
+  if(overlay){
+    overlay.addEventListener('click', function(){ overlay.classList.add('hidden'); });
+  }
+});
+
 var MAP_MARKERS = [
   {
     x: 280, y: 455,
@@ -1819,7 +1890,10 @@ $(function(){
       var title = document.createElementNS(svgNS, 'title');
       title.textContent = t.name;
       path.appendChild(title);
-      path.addEventListener('click', function(){ selectTerritory(t.id); });
+      path.addEventListener('click', function(){
+        selectTerritory(t.id);
+        if(t.id === 'baguette') registerSecretClick();
+      });
       root.appendChild(path);
     });
     linkQueue.forEach(function(l){ root.appendChild(l); });
