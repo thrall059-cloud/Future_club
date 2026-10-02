@@ -169,7 +169,6 @@
   }
   .map-marker:hover{ filter:drop-shadow(0 0 8px #ff3b3b); }
   .map-marker.active{ filter:drop-shadow(0 0 10px #fff); stroke-width:1.6; }
-  /* --- secret : effet "cassé" au 6e clic sur The Baguette --- */
   @keyframes glitch-shake{
     0%{ transform:translate(0,0); filter:none; }
     10%{ transform:translate(-6px,2px) skewX(2deg); filter:hue-rotate(40deg) contrast(1.4); }
@@ -1687,12 +1686,12 @@ var CLANS_DB = [
 ];
 
 /* Une deux et trois, la mort attend mon roi, quatre cinq et six, il renaitra comme un phénix*/
-var SECRET_BAGUETTE_CLICKS = 0;
-var SECRET_BAGUETTE_TEXT = "Place Holder";
+var Bezezfefef = 0;
+var Bezezfefefe = "Place Holder";
 
 function registerSecretClick(){
-  SECRET_BAGUETTE_CLICKS++;
-  if(SECRET_BAGUETTE_CLICKS % 6 === 0) triggerBrokenEffect(SECRET_BAGUETTE_TEXT);
+  Bezezfefefe++;
+  if(Bezezfefefe % 6 === 0) triggerBrokenEffect(Bezezfefef);
 }
 
 function triggerBrokenEffect(text){
